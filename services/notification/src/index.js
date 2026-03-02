@@ -25,7 +25,8 @@ const track = (fn) => async (req, res, next) => {
 };
 
 // endpoints
-\n// GET /events/:orderId: SSE stream
+
+// GET /events/:orderId: SSE stream
 app.get('/events/:orderId', (req, res) => {
     const { orderId } = req.params;
 
