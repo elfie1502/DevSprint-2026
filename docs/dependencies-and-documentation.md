@@ -58,10 +58,10 @@ Tests live in the Gateway and Stock Service. Run them independently:
 
 ```bash
 # From services/gateway
-npm test
+pnpm test
 
 # From services/stock
-npm test
+pnpm test
 ```
 
 Tests use Jest with `--experimental-vm-modules` because all services use ES modules.
