@@ -45,6 +45,10 @@ Each service is running in its own container. Compose manages the start-up order
 
 Jest unit tests in the Gateway and Stock Service test the validation of the orders (invalid fields, invalid format of the auth header), and the logic of the Stock Service to decrease the quantity of an item (successful reduction, zero-stock rejection, optimistic lock conflict). Jest was selected due to its zero configuration and familiar API. The --experimental-vm-modules flag is necessary because the services use ES modules.
 
+# CI/CD: GitHub Actions + DigitalOcean
+
+Deployment is automated with a GitHub Actions workflow (`.github/workflows/deploy.yml`). On every push to `main`, the workflow SSHs into our DigitalOcean droplet using `appleboy/ssh-action`, pulls the latest code, and runs `docker compose up --build -d` to rebuild and restart any changed services. Caddy sits in front as a reverse proxy, handling HTTPS via Let's Encrypt for all subdomains (frontend, API gateway, identity, notifications). This keeps the pipeline minimal, no image registries, no complex build steps, just pull and rebuild on the server.
+
 # Summary Table
 
 | Layer | Technology | Version |
