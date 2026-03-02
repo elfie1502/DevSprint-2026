@@ -15,6 +15,7 @@ app.use(cors());
 const db = new Pool({ connectionString: process.env.DATABASE_URL });
 
 // redis for caching
+const redis = createClient({ url: process.env.REDIS_URL });
 redis.on('error', (e) => console.error('Redis error:', e));
 await redis.connect();
 
@@ -41,7 +42,7 @@ const track = (fn) => async (req, res, next) => {
 };
 
 // ── Rate Limiter ──────────────────────────────────────────────────────────────
-conprevents brute force on login
+const loginLimiter = rateLimit({ // prevents brute force on login
     windowMs: 60 * 1000,
     max: 3,
     keyGenerator: (req) => req.body?.student_id || req.ip,
@@ -157,8 +158,8 @@ app.get('/auth/me', track(async (req, res) => {
 }));
 
 // POST /auth/change-password
-const changePwLimiter = rateLimit({
-   limit password changes too
+const changePwLimiter = rateLimit({ // limit password changes too
+    windowMs: 60 * 1000,
     max: 5,
     keyGenerator: (req) => req.body?.student_id || req.ip,
     message: { error: 'Too many password change attempts. Try again in a minute.' },

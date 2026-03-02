@@ -42,7 +42,8 @@ async function cacheStock(items) {
 }
 
 // endpoints
-\n// GET /stock: all items, refreshes Redis cache
+
+// GET /stock: all items, refreshes Redis cache
 app.get('/stock', track(async (req, res) => {
     const result = await db.query(
         'SELECT * FROM stock.menu_items ORDER BY category, name'
