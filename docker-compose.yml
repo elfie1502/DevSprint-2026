@@ -1,0 +1,149 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: devsprint
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "admin", "-d", "devsprint"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  notification-hub:
+    build: ./services/notification
+    restart: unless-stopped
+    ports:
+      - "3004:3004"
+    environment:
+      PORT: 3004
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3004/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  identity-provider:
+    build: ./services/identity
+    restart: unless-stopped
+    ports:
+      - "3005:3005"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://admin:secret@postgres:5432/devsprint
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: supersecretkey_devsprint2026
+      PORT: 3005
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3005/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  stock-service:
+    build: ./services/stock
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://admin:secret@postgres:5432/devsprint
+      REDIS_URL: redis://redis:6379
+      PORT: 3002
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kitchen-queue:
+    build: ./services/kitchen
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    depends_on:
+      redis:
+        condition: service_healthy
+      notification-hub:
+        condition: service_healthy
+    environment:
+      REDIS_URL: redis://redis:6379
+      NOTIFICATION_SERVICE_URL: http://notification-hub:3004
+      DATABASE_URL: postgres://admin:secret@postgres:5432/devsprint
+      PORT: 3003
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3003/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  order-gateway:
+    build: ./services/gateway
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    depends_on:
+      identity-provider:
+        condition: service_healthy
+      stock-service:
+        condition: service_healthy
+      kitchen-queue:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: supersecretkey_devsprint2026
+      STOCK_SERVICE_URL: http://stock-service:3002
+      KITCHEN_SERVICE_URL: http://kitchen-queue:3003
+      NOTIFICATION_SERVICE_URL: http://notification-hub:3004
+      IDENTITY_SERVICE_URL: http://identity-provider:3005
+      DATABASE_URL: postgres://admin:secret@postgres:5432/devsprint
+      PORT: 3001
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        PUBLIC_GATEWAY_URL: ${PUBLIC_GATEWAY_URL:-http://localhost:3001}
+        PUBLIC_IDENTITY_URL: ${PUBLIC_IDENTITY_URL:-http://localhost:3005}
+        PUBLIC_NOTIFICATION_URL: ${PUBLIC_NOTIFICATION_URL:-http://localhost:3004}
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      order-gateway:
+        condition: service_started
+      notification-hub:
+        condition: service_healthy
+    environment:
+      ORIGIN: ${ORIGIN:-http://localhost:3000}
+
+volumes:
+  postgres_data:
