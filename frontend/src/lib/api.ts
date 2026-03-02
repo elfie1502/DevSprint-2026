@@ -1,8 +1,9 @@
 // Main API client - talks to gateway and identity services
+import { env } from '$env/dynamic/public';
 
-const GATEWAY = import.meta.env.PUBLIC_GATEWAY_URL || 'http://localhost:3001';
-const IDENTITY = import.meta.env.PUBLIC_IDENTITY_URL || 'http://localhost:3005';
-const NOTIF = import.meta.env.PUBLIC_NOTIFICATION_URL || 'http://localhost:3004';
+const GATEWAY = env.PUBLIC_GATEWAY_URL || 'http://localhost:3001';
+const IDENTITY = env.PUBLIC_IDENTITY_URL || 'http://localhost:3005';
+const NOTIF = env.PUBLIC_NOTIFICATION_URL || 'http://localhost:3004';
 
 export { GATEWAY, IDENTITY, NOTIF };
 

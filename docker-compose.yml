@@ -128,12 +128,7 @@ services:
       PORT: 3001
 
   frontend:
-    build:
-      context: ./frontend
-      args:
-        PUBLIC_GATEWAY_URL: ${PUBLIC_GATEWAY_URL:-http://localhost:3001}
-        PUBLIC_IDENTITY_URL: ${PUBLIC_IDENTITY_URL:-http://localhost:3005}
-        PUBLIC_NOTIFICATION_URL: ${PUBLIC_NOTIFICATION_URL:-http://localhost:3004}
+    build: ./frontend
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -143,6 +138,9 @@ services:
       notification-hub:
         condition: service_healthy
     environment:
+      PUBLIC_GATEWAY_URL: ${PUBLIC_GATEWAY_URL:-http://localhost:3001}
+      PUBLIC_IDENTITY_URL: ${PUBLIC_IDENTITY_URL:-http://localhost:3005}
+      PUBLIC_NOTIFICATION_URL: ${PUBLIC_NOTIFICATION_URL:-http://localhost:3004}
       ORIGIN: ${ORIGIN:-http://localhost:3000}
 
 volumes:
