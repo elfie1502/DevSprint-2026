@@ -149,7 +149,7 @@ app.get('/metrics', (req, res) => {
 });
 
 // ── Error Handler ─────────────────────────────────────────────────────────────
-apperror handling
+app.use((err, req, res, next) => { // error handling
     console.error(err);
     res.status(500).json({ error: 'Internal server error' });
 });
