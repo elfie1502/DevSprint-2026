@@ -41,7 +41,7 @@
 			password = 'password';
 		} else {
 			studentId = 'admin';
-			password = 'admin';
+			password = 'admin123';
 		}
 	}
 </script>
