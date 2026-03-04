@@ -2,7 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { auth } from '$lib/auth.svelte';
-	import { api } from '$lib/api';
+	import { api, GATEWAY } from '$lib/api';
 	import { APP_NAME } from '$lib/config';
 	import toast from 'svelte-5-french-toast';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
@@ -64,7 +64,7 @@
 
 	async function sendChaos(service: string, label: string) {
 		try {
-			const res = await fetch(`http://localhost:3001/chaos/kill/${service}`, {
+			const res = await fetch(`${GATEWAY}/chaos/kill/${service}`, {
 				headers: auth.token ? { Authorization: `Bearer ${auth.token}` } : {}
 			});
 			const data = await res.json();
