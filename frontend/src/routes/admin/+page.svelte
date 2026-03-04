@@ -63,6 +63,17 @@
 	}
 
 	async function sendChaos(service: string, label: string) {
+		// Optimistically mark the service as down immediately so the UI updates right away.
+		// The gateway uses names like "notification-hub", "stock-service", etc. — all start with the chaos key.
+		if (health) {
+			health = {
+				...health,
+				status: 'degraded',
+				downstream: health.downstream.map(s =>
+					s.service.startsWith(service) ? { ...s, status: 'down' } : s
+				)
+			};
+		}
 		try {
 			const res = await fetch(`${GATEWAY}/chaos/kill/${service}`, {
 				headers: auth.token ? { Authorization: `Bearer ${auth.token}` } : {}
