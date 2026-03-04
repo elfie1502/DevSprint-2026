@@ -64,7 +64,7 @@
 		</span>
 		<div class="text-center">
 			<h1 class="text-2xl font-bold tracking-tight text-zinc-100">{APP_NAME}</h1>
-			<p class="mt-0.5 text-sm text-zinc-500">{APP_TAGLINE} &mdash; {HACKATHON} · {ORGANIZER}</p>
+			<p class="mt-0.5 text-sm text-zinc-500">{APP_TAGLINE} - {HACKATHON} · {ORGANIZER}</p>
 		</div>
 	</div>
 
