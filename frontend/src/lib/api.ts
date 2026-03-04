@@ -74,7 +74,7 @@ export const api = {
     getOrderHistory: (token: string) => apiFetch('/orders/history', {}, token),
 
     getHealth: async () => {
-        // /health returns 503 when degraded but still has a valid body — don't treat that as an error
+        // /health returns 503 when degraded but still has a valid body - don't treat that as an error
         const res = await fetch(`${GATEWAY}/health`);
         return res.json();
     },

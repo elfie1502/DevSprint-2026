@@ -64,7 +64,7 @@
 
 	async function sendChaos(service: string, label: string) {
 		// Optimistically mark the service as down immediately so the UI updates right away.
-		// The gateway uses names like "notification-hub", "stock-service", etc. — all start with the chaos key.
+		// The gateway uses names like "notification-hub", "stock-service", etc. - all start with the chaos key.
 		if (health) {
 			health = {
 				...health,

@@ -242,7 +242,7 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal server error' });
 });
 
-// POST /chaos/die — for chaos engineering (gateway calls this)
+// POST /chaos/die - for chaos engineering (gateway calls this)
 app.post('/chaos/die', (req, res) => {
     res.json({ message: 'Identity Provider going down' });
     setTimeout(() => process.exit(1), 100);

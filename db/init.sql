@@ -1,5 +1,5 @@
 -- ============================================================
--- DevSprint 2026 — Database Initialization
+-- DevSprint 2026 - Database Initialization
 -- Single PostgreSQL instance, 3 logical schemas
 -- ============================================================
 

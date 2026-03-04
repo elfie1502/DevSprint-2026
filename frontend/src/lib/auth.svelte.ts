@@ -1,4 +1,4 @@
-// Auth store — JWT state persisted in localStorage
+// Auth store - JWT state persisted in localStorage
 import { browser } from '$app/environment';
 
 export interface Student {
